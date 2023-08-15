@@ -30,7 +30,7 @@ This project is currently supported for Ubuntu, Debian, and WSL(Ubuntu, Debian).
 ## Install
 
 ```
-curl -JOL https://github.com/EBosset/wpmanager/releases/download/1.0.0/wpm
+curl -JOL https://github.com/EBosset/wpmanager/releases/latest/download/wpm
 sudo chmod +x wpm
 sudo mv wpm /usr/local/bin
 ```
