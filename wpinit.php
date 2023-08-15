@@ -1,3 +1,5 @@
+#!/usr/bin/env php
+
 <?php
 
 require __DIR__ . '/vendor/autoload.php';
@@ -66,7 +68,7 @@ class WpConfig
         $dbName = null;
         if (!$dbName) {
             while (!$dbName) {
-                # Todo : database name conflict management, drop dotabase ?
+                # Todo : database name conflict management, drop database ?
                 $dbName = $io->ask('Database Name (The name of the database you want to use with WordPress.)');
             }
         }
@@ -272,11 +274,11 @@ function mysqlIsRunning(): bool
 function checkSystemRequirement(): void
 {
     if (!wpCliExist()) {
-        throw new Exception("wp-cli est requis, installez le pour pourvoir executer ce script\nVoir: https://wp-cli.org/fr/");
+        throw new Exception("wp-cli is required, you can install it here : \nVoir: https://wp-cli.org/fr/");
     }
 
     if (!mysqlExist()) {
-        throw new Exception("mysql est requis, installez le pour pourvoir executer ce script\nVoir: https://doc.ubuntu-fr.org/mysql");
+        throw new Exception("mysql is required, you can install it here \nVoir: https://doc.ubuntu-fr.org/mysql");
     }
 
     if (!mysqlIsRunning()) {
@@ -350,7 +352,7 @@ function command(InputInterface $input, OutputInterface $output): int
     }
 
     if (!$path) {
-        throw new Exception('Une eruption solaire a éffacé ma variable !!!');
+        throw new Exception('Une eruption solaire a effacé ma variable !!!');
     }
 
     $io->write('Download WP core into the directory');
@@ -367,9 +369,9 @@ function command(InputInterface $input, OutputInterface $output): int
 
     $io->write('Check database.');
     if (databaseExist($path)) {
-        $io->warning('Database '. $wpConfig->dbName . ' already exist!');
+        $io->warning('Database '. $wpConfig->dbName . ' already exists!');
 
-        $choice = $io->choice('Wath you want to do ?', ['erase old database', 'choose another database name']);
+        $choice = $io->choice('What you want to do ?', ['erase old database', 'choose another database name']);
         if ('choose another database name' === $choice) {
             $dbNameExist = true;
             while ($dbNameExist) {
@@ -381,7 +383,7 @@ function command(InputInterface $input, OutputInterface $output): int
                 $process->run();
                 $dbNameExist = databaseExist($path);
                 if ($dbNameExist) {
-                    $io->write('This database name exist too..');
+                    $io->write('This database name already exists too..');
                 }
             }
         } else {
@@ -407,7 +409,7 @@ function command(InputInterface $input, OutputInterface $output): int
     $io->write($wpInstallProcess->getOutput());
 
 
-    $io->success("Wordpress is ready run it with this command : 'cd $path && wp server'");
+    $io->success("Wordpress is ready, run it with this command : 'cd $path && wp server'");
 
     return Command::SUCCESS;
 }
@@ -459,7 +461,7 @@ function displayRecapConfig(OutputInterface $output, WpConfig $wpConfig): void
 
 try {
     (new SingleCommandApplication())
-        ->setName('Wp Project Initializer')
+        ->setName('Wp Manager')
         ->addOption(
             'locale', 'l',
             InputOption::VALUE_OPTIONAL,
