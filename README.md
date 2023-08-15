@@ -14,14 +14,14 @@ This project is currently supported for Ubuntu, Debian, and WSL(Ubuntu, Debian).
 
 ## Roadmap
 
-### Prochaines releases :
+### Next releases
 
 - add docker support, so you will don't need to install a local database.
 - Add native Windows support
 - Added native IOS support
 - Update/Upgrade system
 
-### Next improvements :
+### Next improvements
 
 - Improved code structure
 - Add PHPStan
