@@ -110,28 +110,28 @@ class WpConfig
         $siteTitle = $input->getOption('title');
         if (!$siteTitle) {
             while (!$siteTitle) {
-                $siteTitle = $io->ask('Site Title:');
+                $siteTitle = $io->ask('Site Title');
             }
         }
 
         $username = $input->getOption('username');
         if (!$username) {
             while (!$username) {
-                $username = $io->ask('Username (Usernames can have only alphanumeric characters, spaces, underscores, hyphens, periods, and the @ symbol.):');
+                $username = $io->ask('Username (Usernames can have only alphanumeric characters, spaces, underscores, hyphens, periods, and the @ symbol.)');
             }
         }
 
         $password = $input->getOption('password');
         if (!$password) {
             while (!$password) {
-                $password = $io->askHidden('Password (You will need this password to log in. Please store it in a secure location.):');
+                $password = $io->askHidden('Password (You will need this password to log in. Please store it in a secure location.)');
             }
         }
 
         $email = $input->getOption('email');
         if (!$email) {
             while (!$email) {
-                $email = $io->ask('Email (Double-check your email address before continuing.):');
+                $email = $io->ask('Email (Double-check your email address before continuing.)');
             }
         }
 
@@ -424,6 +424,16 @@ function databaseExist(string $path): bool
     return (bool) preg_match('/Success: Database checked/', $process->getOutput());
 }
 
+function maskPwd(string $pwd): string
+{
+    $masked = '';
+    for ($i = 0; $i < strlen($pwd); $i++) {
+        $masked .= '*';
+    }
+
+    return $masked;
+}
+
 function displayRecapConfig(OutputInterface $output, WpConfig $wpConfig): void
 {
     $table = new Table($output);
@@ -445,12 +455,12 @@ function displayRecapConfig(OutputInterface $output, WpConfig $wpConfig): void
                 $wpConfig->locale,
                 $wpConfig->dbName,
                 $wpConfig->dbUser,
-                $wpConfig->dbPass,
+                maskPwd($wpConfig->dbPass),
                 $wpConfig->dbHost,
                 $wpConfig->tablePrefix,
                 $wpConfig->siteTitle,
                 $wpConfig->username,
-                $wpConfig->password,
+                maskPwd($wpConfig->password),
                 $wpConfig->email,
             ],
         ])
