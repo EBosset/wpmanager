@@ -81,7 +81,7 @@ class WpConfig
         $dbPass = $input->getOption('db-pass');
         if (!$dbPass) {
             while (!$dbPass) {
-                $dbPass = $io->ask('Password (Your database password.)');
+                $dbPass = $io->askHidden('Password (Your database password.)');
             }
         }
 
@@ -122,7 +122,7 @@ class WpConfig
         $password = $input->getOption('password');
         if (!$password) {
             while (!$password) {
-                $password = $io->ask('Password (You will need this password to log in. Please store it in a secure location.):');
+                $password = $io->askHidden('Password (You will need this password to log in. Please store it in a secure location.):');
             }
         }
 
@@ -166,7 +166,7 @@ class WpConfig
 
         $dbPass = null;
         while (!$dbPass) {
-            $dbPass = $io->ask('Password (Your database password.)');
+            $dbPass = $io->askHidden('Password (Your database password.)');
         }
 
         $dbHost = null;
@@ -193,7 +193,7 @@ class WpConfig
 
         $password = null;
         while (!$password) {
-            $password = $io->ask('Password (You will need this password to log in. Please store it in a secure location.)');
+            $password = $io->askHidden('Password (You will need this password to log in. Please store it in a secure location.)');
         }
 
         $email = null;
@@ -294,6 +294,17 @@ function checkSystemRequirement(): void
  */
 function command(InputInterface $input, OutputInterface $output): int
 {
+    $intro = '
+                ██╗    ██╗██████╗ ███╗   ███╗
+                ██║    ██║██╔══██╗████╗ ████║
+                ██║ █╗ ██║██████╔╝██╔████╔██║
+                ██║███╗██║██╔═══╝ ██║╚██╔╝██║
+                ╚███╔███╔╝██║     ██║ ╚═╝ ██║
+                 ╚══╝╚══╝ ╚═╝     ╚═╝     ╚═╝
+                      WordPress Manager
+    ';
+    echo $intro;
+
     $io = new SymfonyStyle($input, $output);
 
     try {
@@ -354,6 +365,35 @@ function command(InputInterface $input, OutputInterface $output): int
     $process->run();
     $io->write($process->getOutput());
 
+    $io->write('Check database.');
+    if (databaseExist($path)) {
+        $io->warning('Database '. $wpConfig->dbName . ' already exist!');
+
+        $choice = $io->choice('Wath you want to do ?', ['erase old database', 'choose another database name']);
+        if ('choose another database name' === $choice) {
+            $dbNameExist = true;
+            while ($dbNameExist) {
+                $newDbName = $io->ask('New database name');
+                $wpConfig->dbName = $newDbName;
+                $process = Process::fromShellCommandline(
+                    "cd $path && wp config set DB_NAME $newDbName"
+                );
+                $process->run();
+                $dbNameExist = databaseExist($path);
+                if ($dbNameExist) {
+                    $io->write('This database name exist too..');
+                }
+            }
+        } else {
+            $io->write('Drop old database.');
+            $process = Process::fromShellCommandline(
+                "cd $path && wp db drop"
+            );
+            $process->run();
+            $io->write($process->getOutput());
+        }
+    }
+
     $io->write('Create database.');
     $process = Process::fromShellCommandline(
         "cd $path && wp db create"
@@ -370,6 +410,16 @@ function command(InputInterface $input, OutputInterface $output): int
     $io->success("Wordpress is ready run it with this command : 'cd $path && wp server'");
 
     return Command::SUCCESS;
+}
+
+function databaseExist(string $path): bool
+{
+    $process = Process::fromShellCommandline(
+        "cd $path && wp db check"
+    );
+    $process->run();
+
+    return (bool) preg_match('/Success: Database checked/', $process->getOutput());
 }
 
 function displayRecapConfig(OutputInterface $output, WpConfig $wpConfig): void
