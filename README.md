@@ -33,7 +33,9 @@ advanced users who still prefer the CLI approach.
 ### 1. Requirements
 
 - Docker Desktop (Windows, macOS)  
-  or Docker Engine (Linux)
+  - Download: https://www.docker.com/products/docker-desktop/
+- Docker Engine (Linux)  
+  - Documentation: https://docs.docker.com/engine/install/
 
 ### 2. Files
 
@@ -102,6 +104,93 @@ The MySQL data is stored in a named Docker volume (`db_data`) and will persist
 between restarts unless you explicitly remove the volume.
 
 To remove containers **and** the volume:
+
+```bash
+docker compose down -v
+```
+
+---
+
+### Version 2 – Docker / Docker Compose (français)
+
+> **Recommandée pour la plupart des utilisateurs.**  
+> Cette approche utilise Docker Desktop pour lancer un projet WordPress local
+> sans avoir à installer PHP, MySQL ou WP‑CLI directement sur votre machine.
+
+#### 1. Prérequis
+
+- Docker Desktop (Windows, macOS)  
+  - Téléchargement : https://www.docker.com/products/docker-desktop/
+- Docker Engine (Linux)  
+  - Documentation : https://docs.docker.com/engine/install/
+
+#### 2. Fichiers
+
+Ce dépôt fournit un fichier modèle `compose.example.yaml`.
+
+Copiez-le en `compose.yaml` avant de lancer Docker :
+
+```bash
+cp compose.example.yaml compose.yaml
+```
+
+#### 3. Remplir les valeurs
+
+Éditez `compose.yaml` et remplacez toutes les valeurs `XXXXX_...` :
+
+- `XXXXX_ROOT_PASSWORD`  
+  Mot de passe root MySQL (choisissez-en un fort).
+
+- `XXXXX_DB_NAME`  
+  Nom de la base de données WordPress (ex. : `mon_projet_wp`).
+
+- `XXXXX_DB_USER`  
+  Utilisateur MySQL dédié à WordPress (ex. : `wp_user`).
+
+- `XXXXX_DB_PASSWORD`  
+  Mot de passe de l’utilisateur MySQL ci-dessus.
+
+Le fichier définit deux services :
+
+- `db` – un conteneur `mysql:8.0` avec un volume persistant `db_data`.
+- `wordpress` – un conteneur `wordpress:latest` connecté au service `db`,
+  exposé sur le port `8000`.
+
+#### 4. Démarrer l’environnement
+
+Depuis le dossier où se trouve votre `compose.yaml` :
+
+```bash
+docker compose up -d
+```
+
+Docker va :
+
+- Télécharger les images `mysql:8.0` et `wordpress:latest` (si nécessaire).
+- Créer la base MySQL et l’utilisateur avec les valeurs configurées.
+- Lancer le conteneur WordPress relié à la base de données.
+
+#### 5. Accéder à WordPress
+
+Ouvrez votre navigateur et rendez-vous sur :
+
+- `http://localhost:8000`
+
+Vous devriez voir l’écran d’installation standard de WordPress utilisant
+la base configurée dans `compose.yaml`.
+
+#### 6. Arrêter et nettoyer
+
+Pour arrêter les conteneurs :
+
+```bash
+docker compose down
+```
+
+Les données MySQL sont stockées dans un volume Docker nommé (`db_data`) et
+seront conservées entre les redémarrages, sauf si vous supprimez le volume.
+
+Pour supprimer les conteneurs **et** le volume :
 
 ```bash
 docker compose down -v
