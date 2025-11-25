@@ -1,80 +1,162 @@
-![WPM](wpm.png)
-
 # WordPress Manager
+
+![WPM](wpm.png)
 
 ## Description
 
-![DEMO](demo.gif)
+This tool lets you install and configure a WordPress site and create its
+database in less than 5 minutes.
 
-This tool lets you install and configure a Wordpress site and create its database in less than 5 minutes, and start it up without Apache or Ngnix.
+The original goal of this project was to avoid the need for tools such as
+Wamp/Lamp or a local web server (Apache, Nginx) to serve a WordPress project.
 
-The aim of this project was to avoid the need for tools such as Wamp, Lamp, etc. or a local web server (apache, nginx) to serve a WordPress project.
+The project currently provides **two ways** to run a local WordPress site:
 
-This project is currently supported for Ubuntu, Debian, and WSL(Ubuntu, Debian).
+- **Version 2 – Docker (recommended)**: using Docker Desktop and a
+  `docker compose` file.
+- **Version 1 – Legacy CLI (legacy)**: using `wpm`, WP‑CLI, PHP and MySQL
+  installed directly on your system.
 
-## Roadmap
+If you are starting a new local WordPress project today, you should
+**use Version 2 – Docker**. Version 1 is kept for existing workflows and
+advanced users who still prefer the CLI approach.
 
-### Next releases
+---
 
-- add docker support, so you will don't need to install a local database.
-- Add native Windows support
-- Added native IOS support
-- Update/Upgrade system
+## Version 2 – Docker / Docker Compose (recommended)
 
-### Next improvements
+> **Recommended for most users.**  
+> This is a newer, container-based way to run a local WordPress project,
+> using Docker Desktop. You don’t need to install PHP, MySQL or WP‑CLI
+> on your host system.
 
-- Improved code structure
-- Add PHPStan
-- CI/CD
+### 1. Requirements
 
-## Install
+- Docker Desktop (Windows, macOS)  
+  or Docker Engine (Linux)
 
+### 2. Files
+
+This repository contains a `compose.example.yaml` file as a template.
+
+Copy it to `compose.yaml` before running Docker:
+
+```bash
+cp compose.example.yaml compose.yaml
 ```
+
+### 3. Configure the placeholders
+
+Edit `compose.yaml` and replace all `XXXXX_...` placeholders:
+
+- `XXXXX_ROOT_PASSWORD`  
+  MySQL root password (choose a strong one).
+
+- `XXXXX_DB_NAME`  
+  Name of the WordPress database (e.g. `my_wp_project`).
+
+- `XXXXX_DB_USER`  
+  MySQL user dedicated to WordPress (e.g. `wp_user`).
+
+- `XXXXX_DB_PASSWORD`  
+  Password for the MySQL user above.
+
+The file defines two services:
+
+- `db` – a `mysql:8.0` container with a persistent volume `db_data`.
+- `wordpress` – a `wordpress:latest` container connected to the `db` service,
+  exposed on port `8000`.
+
+### 4. Start the stack
+
+From the folder where your `compose.yaml` is located:
+
+```bash
+docker compose up -d
+```
+
+Docker will:
+
+- Pull the `mysql:8.0` and `wordpress:latest` images (if not already present).
+- Create the MySQL database and user with the values you configured.
+- Start the WordPress container linked to the database.
+
+### 5. Access WordPress
+
+Open your browser and go to:
+
+- `http://localhost:8000`
+
+You should see the standard WordPress installation screen, using the database
+configured in `compose.yaml`.
+
+### 6. Stop and clean up
+
+To stop the containers:
+
+```bash
+docker compose down
+```
+
+The MySQL data is stored in a named Docker volume (`db_data`) and will persist
+between restarts unless you explicitly remove the volume.
+
+To remove containers **and** the volume:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Version 1 – Legacy CLI (wpm)
+
+> **Legacy / advanced usage.**  
+> This is the original way WordPress Manager was used and is kept for
+> compatibility with existing workflows. It requires PHP, MySQL and
+> WP‑CLI to be installed on your machine.
+
+### Install
+
+```bash
 curl -JOL https://github.com/EBosset/wpmanager/releases/latest/download/wpm
 sudo chmod +x wpm
 sudo mv wpm /usr/local/bin
 ```
 
-## Requirements
+### Requirements
 
-- WP-CLI
-- MySQL
-- PHP >=7.4 | ^8.2
+- WP‑CLI  
+- MySQL  
+- PHP >= 7.4 | ^8.2  
 
-## Usage
+### Usage
 
-### Interactive usage
+Interactive usage:
 
-```
+```bash
 wpm
 ```
 
-### Available options (optional)
+`wpm` will guide you through:
 
-| Short | Long                          | Description                                  |
-|-------|-------------------------------|----------------------------------------------|
-| -l    | --locale[=LOCALE]             | WP locale for the project [default: "fr_FR"] |
-| -u    | --db-user[=DB-USER]           | Mysql user                                   |
-| -p    | --db-pass[=DB-PASS]           | Mysql password                               |
-| -x    | --table-prefix[=TABLE-PREFIX] | Prefix for wordpress tables [default: "wp_"] |
-| -o    | --db-host[=DB-HOST]           | Project host [default: "localhost"]          |
-| -t    | --title[=TITLE]               | Site title                                   |
-| -y    | --username[=USERNAME]         | Site admin username                          |
-| -s    | --password[=PASSWORD]         | Site admin password                          |
-| -m    | --email[=EMAIL]               | Site admin email                             |
-| -h    | --help                        | Display help                                 |
+- Creating a new database and a MySQL user.
+- Downloading and configuring WordPress using WP‑CLI.
+- Setting up the local environment to run the site.
 
-
+---
 
 ## Contribution
 
-Any contribution is welcome !
+Issues, suggestions and pull requests are welcome.
 
-See [Roadmap](#roadmap) to know our intentions
+- Feel free to open issues for bugs, feature requests or ideas
+  (for both the legacy CLI and the Docker setup).
+- Pull requests are appreciated for improvements, documentation, or new features.
 
-Do not hesitate to open an issue
-
+---
 
 ## Credits
 
-Thanks to [John Khan](https://github.com/johnkhansrc) for his contribution
+Created and maintained by [@EBosset](https://github.com/EBosset).
+
