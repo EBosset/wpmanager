@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      # MySQL root password (choose a secure one)
+      MYSQL_ROOT_PASSWORD: XXXXX_ROOT_PASSWORD
+      # Name of the WordPress database (e.g., my_wp_project)
+      MYSQL_DATABASE: XXXXX_DB_NAME
+      # Name of the MySQL user dedicated to WordPress (e.g., wp_user)
+      MYSQL_USER: XXXXX_DB_USER
+      # Password for the MySQL user above
+      MYSQL_PASSWORD: XXXXX_DB_PASSWORD
+    volumes:
+      # Named volume to persist MySQL data
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    restart: always
+    ports:
+      # Local HTTP port -> WordPress container port
+      # Then access via http://localhost:8000
+      - "8000:80"
+    environment:
+      # Database host (Docker service name + port)
+      WORDPRESS_DB_HOST: db:3306
+      # Must match MYSQL_USER above
+      WORDPRESS_DB_USER: XXXXX_DB_USER
+      # Must match MYSQL_PASSWORD above
+      WORDPRESS_DB_PASSWORD: XXXXX_DB_PASSWORD
+      # Name of the database used by WordPress
+      WORDPRESS_DB_NAME: XXXXX_DB_NAME
+
+volumes:
+  db_data:
+    # Persistent volume for MySQL data
